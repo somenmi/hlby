@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Web App](https://shields.io/badge/WEB-APP-red.svg)](https://somenmi.github.io/hlbyy/)
-![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)
 
 </div>
 
@@ -38,6 +38,9 @@
     
     v1.0.1 : minor fixes
         ↪︎ Другая иконка, текст, визуальные косяки (fix вёрстки)
+    
+    v1.0.2 : Название
+        ↪︎ Возможность добавить название для ссылки самостоятельно
 
 ## 🛠 Использование
 1. Вставьте ссылку в поле

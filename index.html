@@ -331,6 +331,14 @@
                 white-space: nowrap;
                 border: 1px solid var(--date-border);
             }
+
+            .add-block {
+                flex-wrap: wrap;
+            }
+
+            .add-block input {
+                min-width: 200px;
+            }
         }
     </style>
 </head>
@@ -350,7 +358,8 @@
         </div>
 
         <div class="add-block">
-            <input type="text" id="linkInput" placeholder="ссылку сюды" autocomplete="off">
+            <input type="text" id="linkInput" placeholder="ссылка" autocomplete="off">
+            <input type="text" id="titleInput" placeholder="название (необязательно)" autocomplete="off">
             <button class="add-btn" id="addLinkBtn"><i class="ri-add-line"></i></button>
         </div>
 
@@ -508,7 +517,15 @@
                     const mins = dateObj.getMinutes().toString().padStart(2, '0');
                     const dateTimeString = `${d} ${monthShort} ${hours}:${mins}`;
 
-                    const displayTitle = link.title || getDomainFromUrl(link.url);
+                    let displayTitle;
+                    if (link.customTitle) {
+                        displayTitle = link.customTitle;
+                    } else if (link.title) {
+                        displayTitle = link.title;
+                    } else {
+                        displayTitle = getDomainFromUrl(link.url);
+                    }
+
                     const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(link.url)}&sz=32`;
 
                     html += `
@@ -542,8 +559,12 @@
 
             // добавление ссылки
             async function addNewLink() {
-                const input = document.getElementById('linkInput');
-                let rawUrl = input.value.trim();
+                const linkInput = document.getElementById('linkInput');
+                const titleInput = document.getElementById('titleInput');
+
+                let rawUrl = linkInput.value.trim();
+                const customTitle = titleInput.value.trim();
+
                 if (!rawUrl) return;
 
                 if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
@@ -561,39 +582,48 @@
                 const id = Date.now() + '-' + Math.random().toString(36).substring(2, 8);
 
                 const domain = getDomainFromUrl(rawUrl);
-                let initialTitle = knownTitles[domain] || domain;
 
                 const newLink = {
                     id: id,
                     url: rawUrl,
-                    title: initialTitle,
                     added: now
                 };
+
+                if (customTitle) {
+                    newLink.customTitle = customTitle;
+                } else {
+                    newLink.title = knownTitles[domain] || domain;
+                }
 
                 links.push(newLink);
                 saveToStorage();
                 renderLinks();
 
-                input.value = '';
-                input.focus();
+                linkInput.value = '';
+                titleInput.value = '';
+                linkInput.focus();
 
-                try {
-                    const realTitle = await fetchTitleFromAPI(rawUrl);
-                    if (realTitle) {
-                        const linkIndex = links.findIndex(l => l.id === id);
-                        if (linkIndex !== -1) {
-                            links[linkIndex].title = realTitle;
-                            saveToStorage();
+                if (!customTitle) {
+                    try {
+                        const realTitle = await fetchTitleFromAPI(rawUrl);
+                        if (realTitle) {
+                            const linkIndex = links.findIndex(l => l.id === id);
+                            if (linkIndex !== -1) {
+                                if (!links[linkIndex].customTitle) {
+                                    links[linkIndex].title = realTitle;
+                                    saveToStorage();
 
-                            const titleElement = document.querySelector(`.link-row[data-id="${id}"] .link-title`);
-                            if (titleElement) {
-                                titleElement.textContent = realTitle;
-                                titleElement.setAttribute('title', realTitle);
+                                    const titleElement = document.querySelector(`.link-row[data-id="${id}"] .link-title`);
+                                    if (titleElement) {
+                                        titleElement.textContent = realTitle;
+                                        titleElement.setAttribute('title', realTitle);
+                                    }
+                                }
                             }
                         }
+                    } catch (error) {
+                        console.warn('Failed to fetch title:', error);
                     }
-                } catch (error) {
-                    console.warn('Failed to fetch title:', error);
                 }
             }
 
@@ -602,16 +632,26 @@
                 renderLinks();
 
                 const addBtn = document.getElementById('addLinkBtn');
-                const input = document.getElementById('linkInput');
+                const linkInput = document.getElementById('linkInput');
+                const titleInput = document.getElementById('titleInput');
 
                 addBtn.addEventListener('click', addNewLink);
-                input.addEventListener('keypress', (e) => {
+
+                linkInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         addNewLink();
                     }
                 });
-                input.focus();
+
+                titleInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addNewLink();
+                    }
+                });
+
+                linkInput.focus();
             });
         })();
     </script>
