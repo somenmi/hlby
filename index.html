@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLBY / Ссылки</title>
+    <link rel="icon" type="image/x-icon" href="https://github.com/somenmi/images/raw/main/HLBY/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="https://github.com/somenmi/images/raw/main/HLBY/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-page: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-soft: #b1bac4;
+            --text-muted: #8b949e;
+            --date-bg: #21262d;
+            --date-border: #3d444d;
+            --input-bg: #0d1117;
+            --input-border: #30363d;
+            --hover-border: #6e7681;
+            --delete-color: #f85149;
+            --delete-hover: #ff7b72;
+            --title-bg: #1f252e;
+            --title-border: #3d444d;
+            --shadow: rgba(0, 0, 0, 0.4);
+            --empty-color: #8b949e;
+            --empty-bg: #1f252e;
+            --empty-border: #3d444d;
+        }
+
+        body.light {
+            --bg-page: #f4f6fa;
+            --surface: #ffffff;
+            --border: #e2e6ed;
+            --text-primary: #1a1e2b;
+            --text-soft: #2c3344;
+            --text-muted: #515e7c;
+            --date-bg: #f0f3f9;
+            --date-border: #dce2ec;
+            --input-bg: white;
+            --input-border: #dfe4ec;
+            --hover-border: #cdd6e8;
+            --delete-color: #d14343;
+            --delete-hover: #b00020;
+            --title-bg: #f4f7fd;
+            --title-border: #e3e8f2;
+            --shadow: rgba(0, 0, 0, 0.02);
+            --empty-color: #8895b7;
+            --empty-bg: #edf2fa;
+            --empty-border: #cbd5e5;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: background-color 0.2s;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .date {
+            font-weight: 450;
+            background: var(--surface);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            color: var(--text-soft);
+        }
+
+        .right-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .save-status {
+            color: #7ee3b8;
+            background: #1f3830;
+            width: 42px;
+            height: 42px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid #2f6e54;
+        }
+
+        body.light .save-status {
+            color: #2a7a62;
+            background: #e1f3ee;
+            border-color: #b6decb;
+        }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            transition: 0.15s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--hover-border);
+            background: var(--title-bg);
+        }
+
+        .add-block {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 2.5rem;
+        }
+
+        .add-block input {
+            flex: 1;
+            padding: 0 20px;
+            height: 56px;
+            background: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            color: var(--text-primary);
+            transition: 0.15s;
+        }
+
+        .add-block input:focus {
+            border-color: var(--text-muted);
+        }
+
+        .add-btn {
+            width: 56px;
+            height: 56px;
+            background: #1f8b4c;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid #15753d;
+            flex-shrink: 0;
+        }
+
+        .add-btn:hover {
+            background: #0f7237;
+            transform: scale(0.96);
+        }
+
+        .links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .link-row {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 8px 14px 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border);
+            transition: 0.1s;
+            max-height: 42px;
+        }
+
+        .link-row:hover {
+            border-color: var(--hover-border);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--delete-color);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0 2px;
+            opacity: 0.8;
+            transition: 0.1s;
+            border-radius: 40px;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            color: var(--delete-hover);
+            background: rgba(209, 67, 67, 0.1);
+        }
+
+        .datetime {
+            font-size: 0.8rem;
+            background: var(--date-bg);
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            color: var(--text-soft);
+            white-space: nowrap;
+            border: 1px solid var(--date-border);
+        }
+
+        .site-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            background: var(--title-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            order: 0;
+        }
+
+        .site-icon img {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+        }
+
+        .link-container {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .link-container a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            padding: 4px 4px;
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .link-container a:hover {
+            border-bottom-color: #4e6b9b;
+        }
+
+        .link-title {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background: var(--title-bg);
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+            border: 1px solid var(--title-border);
+            flex-shrink: 1;
+        }
+
+        html {
+            overflow: scroll;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        html::-webkit-scrollbar {
+            display: none;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: var(--empty-color);
+            background: var(--empty-bg);
+            padding: 2rem 1.5rem;
+            border-radius: 32px;
+            border: 2px dashed var(--empty-border);
+            font-size: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 700px) {
+            .link-title {
+                max-width: 180px;
+            }
+
+            .datetime {
+                font-size: 0.8rem;
+                background: var(--date-bg);
+                padding: 4px 6px;
+                border-radius: 30px;
+                color: var(--text-soft);
+                white-space: nowrap;
+                border: 1px solid var(--date-border);
+            }
+        }
+    </style>
+</head>
+
+<body class="dark">
+    <div class="container">
+        <div class="top-bar">
+            <span class="date" id="currentDate"></span>
+            <div class="right-group">
+                <span class="save-status">
+                    <i class="ri-database-2-line"></i>
+                </span>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="ri-moon-fill"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="add-block">
+            <input type="text" id="linkInput" placeholder="вставьте ссылку (https://...)" autocomplete="off">
+            <button class="add-btn" id="addLinkBtn"><i class="ri-add-large-line"></i></button>
+        </div>
+
+        <div class="links-list" id="linksList"></div>
+    </div>
+
+    <script>
+        (function () {
+            // дата
+            const dateElement = document.getElementById('currentDate');
+            const today = new Date();
+            const day = today.getDate();
+            const monthNames = ["января", "февраля", "марта", "апреля", "мая", "июня",
+                "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+            dateElement.textContent = `${day} ${monthNames[today.getMonth()]}`;
+
+            // тема
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+            const body = document.body;
+
+            function setTheme(theme) {
+                if (theme === 'light') {
+                    body.classList.remove('dark');
+                    body.classList.add('light');
+                    themeIcon.className = 'ri-sun-fill';
+                } else {
+                    body.classList.remove('light');
+                    body.classList.add('dark');
+                    themeIcon.className = 'ri-moon-fill';
+                }
+                localStorage.setItem('widtyTheme', theme);
+            }
+
+            const savedTheme = localStorage.getItem('widtyTheme') || 'dark';
+            setTheme(savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
+                setTheme(newTheme);
+            });
+
+            // хранилище
+            let links = [];
+
+            function loadFromStorage() {
+                try {
+                    const stored = localStorage.getItem('widtyLinks');
+                    links = stored ? JSON.parse(stored) : [];
+                } catch { links = []; }
+            }
+
+            function saveToStorage() {
+                localStorage.setItem('widtyLinks', JSON.stringify(links));
+            }
+
+            // API для получения title
+            async function fetchTitleFromAPI(url) {
+                try {
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                    const data = await response.json();
+
+                    const match = data.contents.match(/<title[^>]*>([^<]+)<\/title>/i);
+                    if (match && match[1]) {
+                        return match[1].trim();
+                    }
+
+                    const metaMatch = data.contents.match(/<meta[^>]*property="og:title"[^>]*content="([^"]+)"[^>]*>/i);
+                    if (metaMatch && metaMatch[1]) {
+                        return metaMatch[1].trim();
+                    }
+
+                    return null;
+                } catch (error) {
+                    console.warn('API error:', error);
+                    return null;
+                }
+            }
+
+            // База известных сайтов
+            const knownTitles = {
+                'github.com/somenmi': 'GitHub Yalkee',
+                'somenmi.github.io/mny': 'Заметки',
+                'somenmi.github.io/ERBY': 'Визуальный конструктор дорожных карт',
+                'somenmi.github.io/widty': 'Календарный ежедневник',
+                'somenmi.github.io/hlby': 'Гиперссылки',
+                'github.com/somenmi/MAGL': 'MAGL (MicAutoGainLock)',
+                'donaters.vercel.app': 'Топ Донатеров',
+                'vk.com/app53485219': 'Фигуры 2048',
+                'awalores-platforms.vercel.app': 'AWALORES - платформы',
+                'awalores-only.vercel.app': 'Для Любимой ♥',
+                'youtube.com': 'YouTube',
+                'yandex.ru': 'Яндекс',
+                'ya.ru': 'Яндекс',
+                'yandex.com': 'Yandex',
+                'mail.ru': 'Mail.ru',
+                'rambler.ru': 'Rambler',
+                'google.com': 'Google',
+                'google.ru': 'Google',
+                'vk.com': 'ВКонтакте',
+                'ok.ru': 'Одноклассники',
+                't.me': 'Telegram',
+                'telegram.org': 'Telegram',
+                'telegram.me': 'Telegram',
+                'wildberries.ru': 'Wildberries',
+                'ozon.ru': 'Ozon',
+                'avito.ru': 'Авито',
+                'market.yandex.ru': 'Яндекс Маркет',
+                'sbermegamarket.ru': 'Мегамаркет',
+                'vkvideo.ru': 'VK Видео',
+                'kinopoisk.ru': 'Кинопоиск',
+                'github.com': 'GitHub',
+                'habr.com': 'Habr',
+                'habr.ru': 'Habr',
+                'yandex.ru/maps': 'Яндекс Карты',
+                '2gis.ru': '2ГИС',
+                'translate.yandex.ru': 'Яндекс Переводчик',
+                'disk.yandex.ru': 'Яндекс Диск',
+                'cloud.mail.ru': 'Облако Mail.ru',
+                'mail.yandex.ru': 'Яндекс Почта',
+                'hh.ru': 'HeadHunter',
+                'steampowered.com': 'Steam',
+                'binance.com': 'Binance',
+                'gismeteo.ru': 'Gismeteo',
+                'yandex.ru/pogoda': 'Яндекс Погода'
+            };
+
+            function getDomainFromUrl(url) {
+                try {
+                    const hostname = new URL(url).hostname.replace('www.', '');
+                    return hostname;
+                } catch {
+                    return '';
+                }
+            }
+
+            // отрисовка
+            function renderLinks() {
+                const container = document.getElementById('linksList');
+                if (!container) return;
+
+                if (links.length === 0) {
+                    container.innerHTML = `<div class="empty-message"><i class="ri-link-unlink" style="font-size: 2rem; display: block; margin-bottom: 12px;"></i>нет сохранённых ссылок</div>`;
+                    return;
+                }
+
+                const sorted = [...links].sort((a, b) => new Date(b.added) - new Date(a.added));
+
+                let html = '';
+                for (let link of sorted) {
+                    const dateObj = new Date(link.added);
+                    const d = dateObj.getDate();
+                    const monthShort = monthNames[dateObj.getMonth()].slice(0, 3);
+                    const hours = dateObj.getHours().toString().padStart(2, '0');
+                    const mins = dateObj.getMinutes().toString().padStart(2, '0');
+                    const dateTimeString = `${d} ${monthShort} ${hours}:${mins}`;
+
+                    const displayTitle = link.title || getDomainFromUrl(link.url);
+                    const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(link.url)}&sz=32`;
+
+                    html += `
+                    <div class="link-row" data-id="${link.id}">
+                        <button class="delete-btn" data-id="${link.id}" title="удалить"><i class="ri-delete-bin-line"></i></button>
+                        <span class="datetime">${dateTimeString}</span>
+                        <div class="site-icon">
+                            <img src="${faviconUrl}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'ri-global-line\'></i>';">
+                        </div>
+                        <div class="link-container">
+                            <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a>
+                        </div>
+                        <div class="link-title" title="${displayTitle.replace(/"/g, '&quot;')}">${displayTitle}</div>
+                    </div>
+                `;
+                }
+                container.innerHTML = html;
+
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute('data-id');
+                        if (id) {
+                            links = links.filter(l => l.id !== id);
+                            saveToStorage();
+                            renderLinks();
+                        }
+                    });
+                });
+            }
+
+            // добавление ссылки
+            async function addNewLink() {
+                const input = document.getElementById('linkInput');
+                let rawUrl = input.value.trim();
+                if (!rawUrl) return;
+
+                if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+                    rawUrl = 'https://' + rawUrl;
+                }
+
+                try {
+                    new URL(rawUrl);
+                } catch (e) {
+                    alert('некорректный URL');
+                    return;
+                }
+
+                const now = new Date().toISOString();
+                const id = Date.now() + '-' + Math.random().toString(36).substring(2, 8);
+
+                const domain = getDomainFromUrl(rawUrl);
+                let initialTitle = knownTitles[domain] || domain;
+
+                const newLink = {
+                    id: id,
+                    url: rawUrl,
+                    title: initialTitle,
+                    added: now
+                };
+
+                links.push(newLink);
+                saveToStorage();
+                renderLinks();
+
+                input.value = '';
+                input.focus();
+
+                try {
+                    const realTitle = await fetchTitleFromAPI(rawUrl);
+                    if (realTitle) {
+                        const linkIndex = links.findIndex(l => l.id === id);
+                        if (linkIndex !== -1) {
+                            links[linkIndex].title = realTitle;
+                            saveToStorage();
+
+                            const titleElement = document.querySelector(`.link-row[data-id="${id}"] .link-title`);
+                            if (titleElement) {
+                                titleElement.textContent = realTitle;
+                                titleElement.setAttribute('title', realTitle);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to fetch title:', error);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                loadFromStorage();
+                renderLinks();
+
+                const addBtn = document.getElementById('addLinkBtn');
+                const input = document.getElementById('linkInput');
+
+                addBtn.addEventListener('click', addNewLink);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addNewLink();
+                    }
+                });
+                input.focus();
+            });
+        })();
+    </script>
+</body>
+
+</html>
