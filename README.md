@@ -5,7 +5,7 @@
         </td>
         <td align="center">
             <h1><a href="https://somenmi.github.io/hlby/"><b>HLBY</b> (HyperLinks by Yalkee)</a></h1>
-            <p><strong>Минималистичное приложение для хранения ссылок</strong></p>
+            <p><strong>Приложение для хранения ссылок</strong></p>
         </td>
     </tr>
 </table>
