@@ -16,24 +16,24 @@
         }
 
         :root {
-            --bg-page: #0d1117;
-            --surface: #161b22;
-            --border: #30363d;
+            --bg-page: #1b1b1b;
+            --surface: #202020;
+            --border: #3d3d3d;
             --text-primary: #e6edf3;
             --text-soft: #b1bac4;
             --text-muted: #8b949e;
             --date-bg: #21262d;
             --date-border: #3d444d;
-            --input-bg: #0d1117;
-            --input-border: #30363d;
+            --input-bg: #1f1f1f;
+            --input-border: #353638;
             --hover-border: #6e7681;
             --delete-color: #f85149;
             --delete-hover: #ff7b72;
-            --title-bg: #1f252e;
+            --title-bg: #303133;
             --title-border: #3d444d;
             --shadow: rgba(0, 0, 0, 0.4);
             --empty-color: #8b949e;
-            --empty-bg: #1f252e;
+            --empty-bg: #222325;
             --empty-border: #3d444d;
         }
 
@@ -41,7 +41,7 @@
             --bg-page: #f4f6fa;
             --surface: #ffffff;
             --border: #e2e6ed;
-            --text-primary: #1a1e2b;
+            --text-primary: #1f222e;
             --text-soft: #2c3344;
             --text-muted: #515e7c;
             --date-bg: #f0f3f9;
@@ -79,7 +79,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
+            margin-bottom: 1.2rem;
             font-size: 0.95rem;
         }
 
@@ -141,7 +141,7 @@
         .add-block {
             display: flex;
             gap: 8px;
-            margin-bottom: 2.5rem;
+            margin-bottom: 1.6rem;
         }
 
         .add-block input {
@@ -209,12 +209,12 @@
             background: none;
             border: none;
             color: var(--delete-color);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
             cursor: pointer;
             padding: 0 2px;
-            opacity: 0.8;
+            opacity: 0.7;
             transition: 0.1s;
             border-radius: 40px;
         }
@@ -222,7 +222,6 @@
         .delete-btn:hover {
             opacity: 1;
             color: var(--delete-hover);
-            background: rgba(209, 67, 67, 0.1);
         }
 
         .datetime {
@@ -305,11 +304,11 @@
             text-align: center;
             color: var(--empty-color);
             background: var(--empty-bg);
-            padding: 2rem 1.5rem;
+            padding: 3.5rem 1.5rem;
             border-radius: 32px;
             border: 2px dashed var(--empty-border);
             font-size: 1rem;
-            margin-top: 2rem;
+            margin-top: 1.6rem;
         }
 
         button {
@@ -351,8 +350,8 @@
         </div>
 
         <div class="add-block">
-            <input type="text" id="linkInput" placeholder="вставьте ссылку (https://...)" autocomplete="off">
-            <button class="add-btn" id="addLinkBtn"><i class="ri-add-large-line"></i></button>
+            <input type="text" id="linkInput" placeholder="ссылку сюды" autocomplete="off">
+            <button class="add-btn" id="addLinkBtn"><i class="ri-add-line"></i></button>
         </div>
 
         <div class="links-list" id="linksList"></div>
