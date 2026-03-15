@@ -234,6 +234,28 @@
             border: 1px solid var(--date-border);
         }
 
+        .hub-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            transition: background-color 0.2s;
+            border: 1px solid #b49220;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: 0.15s;
+            color: #7ee3b8;
+            background: #3a351f;
+        }
+
+        .hub-link:hover {
+            background-color: rgba(214, 146, 0, 0.3);
+            border: 1px solid #ffc400;
+        }
+
         .site-icon {
             width: 20px;
             height: 20px;
@@ -348,6 +370,10 @@
         <div class="top-bar">
             <span class="date" id="currentDate"></span>
             <div class="right-group">
+                <a href="https://somenmi.github.io/hub_nity/" class="hub-link" title="Перейти в Yalkee Hub">
+                    <img src="https://raw.githubusercontent.com/somenmi/images/main/hub_nity/logo.png" alt="Hub"
+                        style="width: 20px; height: 20px;">
+                </a>
                 <span class="save-status">
                     <i class="ri-database-2-line"></i>
                 </span>

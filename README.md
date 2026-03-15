@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Web App](https://shields.io/badge/WEB-APP-red.svg)](https://somenmi.github.io/hlbyy/)
-![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)
 
 </div>
 
@@ -41,6 +41,8 @@
     
     v1.0.2 : Название
         ↪︎ Возможность добавить название для ссылки самостоятельно
+    
+    v1.0.3 : Иконка перехода в Yalkee HUB
 
 ## 🛠 Использование
 1. Вставьте ссылку в поле
