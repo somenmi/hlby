@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Web App](https://shields.io/badge/WEB-APP-red.svg)](https://somenmi.github.io/hlbyy/)
-![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 
 </div>
 
@@ -36,13 +36,17 @@
     × Переключение тем
     × Компактный дизайн
     
-    v1.0.1 : minor fixes
+    × v1.0.1 : minor fixes
         ↪︎ Другая иконка, текст, визуальные косяки (fix вёрстки)
     
-    v1.0.2 : Название
+    × v1.0.2 : Название
         ↪︎ Возможность добавить название для ссылки самостоятельно
     
-    v1.0.3 : Иконка перехода в Yalkee HUB
+    × v1.0.3 : Иконка перехода в Yalkee HUB
+
+### v1.1.0 - сортировка
+
+    × Возможность перемещать строку вверх/вниз (сортировать)
 
 ## 🛠 Использование
 1. Вставьте ссылку в поле

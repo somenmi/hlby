@@ -35,6 +35,9 @@
             --empty-color: #8b949e;
             --empty-bg: #222325;
             --empty-border: #3d444d;
+            --drag-color: #8b949e;
+            --drag-hover: #b1bac4;
+            --drag-line: #4e6b9b;
         }
 
         body.light {
@@ -57,6 +60,9 @@
             --empty-color: #8895b7;
             --empty-bg: #edf2fa;
             --empty-border: #cbd5e5;
+            --drag-color: #8895b7;
+            --drag-hover: #515e7c;
+            --drag-line: #4e6b9b;
         }
 
         body {
@@ -187,6 +193,13 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            position: relative;
+            user-select: none;
+            transition: gap 0.2s ease;
+        }
+
+        .links-list.drag-active {
+            gap: 20px;
         }
 
         .link-row {
@@ -197,12 +210,38 @@
             align-items: center;
             gap: 10px;
             border: 1px solid var(--border);
-            transition: 0.1s;
             max-height: 42px;
+            position: relative;
+            transition: none;
         }
 
-        .link-row:hover {
-            border-color: var(--hover-border);
+        .link-row.dragging {
+            opacity: 0.3;
+        }
+
+        /* Раздвижение строк */
+        .link-row.shift-up {
+            transform: translateY(-8px);
+        }
+
+        .link-row.shift-down {
+            transform: translateY(8px);
+        }
+
+        /* Линия между строками */
+        .drop-line {
+            position: fixed;
+            height: 2px;
+            background: var(--drag-line);
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 0 4px var(--drag-line);
+            display: none;
+        }
+
+        .drop-line.visible {
+            display: block;
         }
 
         .delete-btn {
@@ -267,7 +306,6 @@
             font-size: 16px;
             color: var(--text-muted);
             flex-shrink: 0;
-            order: 0;
         }
 
         .site-icon img {
@@ -310,6 +348,23 @@
             max-width: 300px;
             border: 1px solid var(--title-border);
             flex-shrink: 1;
+        }
+
+        .drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--drag-color);
+            font-size: 1.2rem;
+            cursor: move;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
         }
 
         html {
@@ -435,7 +490,22 @@
                 try {
                     const stored = localStorage.getItem('widtyLinks');
                     links = stored ? JSON.parse(stored) : [];
-                } catch { links = []; }
+
+                    // Добавляем поле order, если его нет
+                    let needsUpdate = false;
+                    links.forEach((link, index) => {
+                        if (link.order === undefined) {
+                            link.order = index;
+                            needsUpdate = true;
+                        }
+                    });
+
+                    if (needsUpdate) {
+                        saveToStorage();
+                    }
+                } catch {
+                    links = [];
+                }
             }
 
             function saveToStorage() {
@@ -522,6 +592,242 @@
                 }
             }
 
+            // Drag and Drop
+            let draggedItem = null;
+            let draggedId = null;
+            let draggedIndex = -1;
+            let dropLine = null;
+            let currentDropData = null;
+
+            function initDropLine() {
+                if (!dropLine) {
+                    dropLine = document.createElement('div');
+                    dropLine.className = 'drop-line';
+                    document.body.appendChild(dropLine);
+                }
+                return dropLine;
+            }
+
+            function hideDropLine() {
+                if (dropLine) {
+                    dropLine.classList.remove('visible');
+                }
+            }
+
+            function showDropLine(left, top, width) {
+                if (!dropLine) {
+                    initDropLine();
+                }
+                dropLine.style.left = left + 'px';
+                dropLine.style.top = top + 'px';
+                dropLine.style.width = width + 'px';
+                dropLine.classList.add('visible');
+            }
+
+            function removeDropLine() {
+                if (dropLine) {
+                    dropLine.remove();
+                    dropLine = null;
+                }
+            }
+
+            function clearShiftClasses() {
+                document.querySelectorAll('.link-row').forEach(row => {
+                    row.classList.remove('shift-up', 'shift-down');
+                });
+            }
+
+            function handleDragStart(e) {
+                const handle = e.target.closest('.drag-handle');
+                if (!handle) return;
+
+                const row = handle.closest('.link-row');
+                if (!row) return;
+
+                draggedItem = row;
+                draggedId = row.getAttribute('data-id');
+                draggedIndex = links.findIndex(l => l.id === draggedId);
+
+                row.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', draggedId);
+                e.dataTransfer.effectAllowed = 'move';
+
+                // Инициализируем линию
+                initDropLine();
+                currentDropData = null;
+
+                // Добавляем класс для увеличения gap
+                document.getElementById('linksList').classList.add('drag-active');
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+
+                if (!draggedItem) return;
+
+                const rows = Array.from(document.querySelectorAll('.link-row:not(.dragging)'));
+                const listRect = document.getElementById('linksList').getBoundingClientRect();
+                const mouseY = e.clientY;
+
+                // Сначала убираем всё
+                clearShiftClasses();
+                hideDropLine();
+                currentDropData = null;
+
+                // Если мышь вне списка
+                if (mouseY < listRect.top || mouseY > listRect.bottom) {
+                    return;
+                }
+
+                // Ищем промежуток между строками
+                for (let i = 0; i < rows.length; i++) {
+                    const currentRow = rows[i];
+                    const currentRect = currentRow.getBoundingClientRect();
+
+                    // Перед первой строкой
+                    if (i === 0 && mouseY < currentRect.top + 4) {
+                        // Сдвигаем первую строку вниз
+                        currentRow.classList.add('shift-down');
+
+                        // Показываем линию перед первой строкой
+                        showDropLine(
+                            currentRect.left + 10,
+                            currentRect.top - 10,
+                            currentRect.width - 20
+                        );
+
+                        // Сохраняем данные для дропа
+                        currentDropData = {
+                            targetId: currentRow.getAttribute('data-id'),
+                            position: 'before',
+                            index: i
+                        };
+                        break;
+                    }
+
+                    // Между строками
+                    if (i < rows.length - 1) {
+                        const nextRow = rows[i + 1];
+                        const nextRect = nextRow.getBoundingClientRect();
+                        const gapMiddle = (currentRect.bottom + nextRect.top) / 2;
+
+                        if (mouseY > currentRect.bottom - 4 && mouseY < nextRect.top + 4) {
+                            // Сдвигаем текущую вверх, следующую вниз
+                            currentRow.classList.add('shift-up');
+                            nextRow.classList.add('shift-down');
+
+                            // Показываем линию между ними
+                            showDropLine(
+                                currentRect.left + 10,
+                                gapMiddle - 1,
+                                currentRect.width - 20
+                            );
+
+                            // Сохраняем данные для дропа (вставляем после current)
+                            currentDropData = {
+                                targetId: currentRow.getAttribute('data-id'),
+                                position: 'after',
+                                index: i + 1
+                            };
+                            break;
+                        }
+                    }
+
+                    // После последней строки
+                    if (i === rows.length - 1 && mouseY > currentRect.bottom - 4) {
+                        // Сдвигаем последнюю строку вверх
+                        currentRow.classList.add('shift-up');
+
+                        // Показываем линию после последней строки
+                        showDropLine(
+                            currentRect.left + 10,
+                            currentRect.bottom + 8,
+                            currentRect.width - 20
+                        );
+
+                        // Сохраняем данные для дропа (вставляем после последней)
+                        currentDropData = {
+                            targetId: currentRow.getAttribute('data-id'),
+                            position: 'after',
+                            index: i + 1
+                        };
+                        break;
+                    }
+                }
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+
+                if (!draggedItem || !currentDropData) {
+                    cleanup();
+                    return;
+                }
+
+                // Находим индекс целевого элемента в исходном массиве
+                const targetIndex = links.findIndex(l => l.id === currentDropData.targetId);
+
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    // Удаляем перетаскиваемый элемент
+                    const [draggedLink] = links.splice(draggedIndex, 1);
+
+                    // Определяем новый индекс для вставки
+                    let newIndex;
+
+                    if (currentDropData.position === 'before') {
+                        // Вставляем перед целевым элементом
+                        newIndex = targetIndex;
+                        // Если перетаскиваемый элемент был до целевого, после удаления индекс цели смещается
+                        if (draggedIndex < targetIndex) {
+                            newIndex = targetIndex - 1;
+                        }
+                    } else {
+                        // Вставляем после целевого элемента
+                        newIndex = targetIndex + 1;
+                        // Если перетаскиваемый элемент был до целевого, после удаления индекс цели смещается
+                        if (draggedIndex < targetIndex) {
+                            newIndex = targetIndex; // потому что targetIndex уже уменьшился на 1
+                        }
+                        // Если перетаскиваемый элемент был после целевого, индекс остаётся targetIndex + 1
+                    }
+
+                    // Вставляем на новое место
+                    links.splice(newIndex, 0, draggedLink);
+
+                    // Обновляем порядок
+                    links.forEach((link, idx) => {
+                        link.order = idx;
+                    });
+
+                    saveToStorage();
+                }
+
+                cleanup();
+                renderLinks();
+            }
+
+            function handleDragEnd(e) {
+                cleanup();
+            }
+
+            function cleanup() {
+                if (draggedItem) {
+                    draggedItem.classList.remove('dragging');
+                }
+
+                clearShiftClasses();
+                hideDropLine();
+
+                // Убираем класс увеличенного gap
+                document.getElementById('linksList').classList.remove('drag-active');
+
+                draggedItem = null;
+                draggedId = null;
+                draggedIndex = -1;
+                currentDropData = null;
+            }
+
             // отрисовка
             function renderLinks() {
                 const container = document.getElementById('linksList');
@@ -532,7 +838,8 @@
                     return;
                 }
 
-                const sorted = [...links].sort((a, b) => new Date(b.added) - new Date(a.added));
+                // Сортируем по полю order
+                const sorted = [...links].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
                 let html = '';
                 for (let link of sorted) {
@@ -555,7 +862,7 @@
                     const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(link.url)}&sz=32`;
 
                     html += `
-                    <div class="link-row" data-id="${link.id}">
+                    <div class="link-row" data-id="${link.id}" draggable="false">
                         <button class="delete-btn" data-id="${link.id}" title="удалить"><i class="ri-delete-bin-line"></i></button>
                         <span class="datetime">${dateTimeString}</span>
                         <div class="site-icon">
@@ -565,10 +872,26 @@
                             <a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a>
                         </div>
                         <div class="link-title" title="${displayTitle.replace(/"/g, '&quot;')}">${displayTitle}</div>
+                        <div class="drag-handle" draggable="true" title="Перетащить для сортировки">
+                            <i class="ri-menu-line"></i>
+                        </div>
                     </div>
                 `;
                 }
                 container.innerHTML = html;
+
+                // Добавляем обработчики drag and drop
+                document.querySelectorAll('.drag-handle').forEach(handle => {
+                    handle.addEventListener('dragstart', handleDragStart);
+                    handle.addEventListener('dragend', handleDragEnd);
+                });
+
+                container.addEventListener('dragover', handleDragOver);
+                container.addEventListener('drop', handleDrop);
+
+                // Предотвращаем стандартное поведение браузера
+                container.addEventListener('dragenter', (e) => e.preventDefault());
+                container.addEventListener('dragleave', (e) => e.preventDefault());
 
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -580,6 +903,11 @@
                             renderLinks();
                         }
                     });
+                });
+
+                // Отключаем нативный drag для картинок
+                document.querySelectorAll('img').forEach(img => {
+                    img.setAttribute('draggable', 'false');
                 });
             }
 
@@ -611,7 +939,8 @@
                 const newLink = {
                     id: id,
                     url: rawUrl,
-                    added: now
+                    added: now,
+                    order: links.length
                 };
 
                 if (customTitle) {
